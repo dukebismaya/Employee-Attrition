@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">HR Analytics</div>
+        <div class="nav-links">
+            <a href="/">Predict</a>
+            <a href="/metrics" class="active">Model Stats</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <h1>Model Performance</h1>
+            <p>XGBoost classifier trained on IBM HR Analytics dataset</p>
+        </div>
+
+        <div class="metrics-container">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.accuracy * 100) }}%</div>
+                    <div class="metric-label">Accuracy</div>
+                    <div class="metric-desc">Overall correct predictions</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.precision * 100) }}%</div>
+                    <div class="metric-label">Precision</div>
+                    <div class="metric-desc">True positives / predicted positives</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.1f"|format(metrics.recall * 100) }}%</div>
+                    <div class="metric-label">Recall</div>
+                    <div class="metric-desc">True positives / actual positives</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.2f"|format(metrics.f1_score) }}</div>
+                    <div class="metric-label">F1 Score</div>
+                    <div class="metric-desc">Harmonic mean of precision and recall</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">{{ "%.2f"|format(metrics.roc_auc) }}</div>
+                    <div class="metric-label">ROC AUC</div>
+                    <div class="metric-desc">Area under the ROC curve</div>
+                </div>
+            </div>
+
+            <div class="confusion-section">
+                <h2>Confusion Matrix</h2>
+                <img src="{{ url_for('static', filename='confusion.png') }}" alt="Confusion Matrix" class="confusion-img">
+            </div>
+
+            <div class="model-details">
+                <h2>Model Details</h2>
+                <div class="details-list">
+                    <div class="detail-row">
+                        <span class="detail-key">Algorithm</span>
+                        <span class="detail-value">XGBoost Classifier</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Data Balancing</span>
+                        <span class="detail-value">SMOTE (Synthetic Minority Over-sampling)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Feature Scaling</span>
+                        <span class="detail-value">StandardScaler for numerical features</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Encoding</span>
+                        <span class="detail-value">OneHotEncoder for categorical features</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-key">Dataset</span>
+                        <span class="detail-value">IBM HR Analytics Employee Attrition</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/" class="btn-primary">Back to Prediction</a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Employee Attrition Prediction System • Built with XGBoost</p>
+    </footer>
+</body>
+</html>

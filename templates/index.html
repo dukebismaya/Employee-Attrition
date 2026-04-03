@@ -1,23 +1,274 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Employee Attrition Prediction</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Attrition Predictor</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Employee Attrition Prediction</h1>
-        <form action="/predict" method="post">
-            <input type="number" name="Age" placeholder="Age" required>
-            <input type="number" name="DailyRate" placeholder="Daily Rate" required>
-            <input type="number" name="DistanceFromHome" placeholder="Distance From Home" required>
-            <input type="number" name="MonthlyIncome" placeholder="Monthly Income" required>
-            <input type="number" name="TotalWorkingYears" placeholder="Total Working Years" required>
-            <input type="number" name="YearsAtCompany" placeholder="Years At Company" required>
-            <input type="number" name="JobLevel" placeholder="Job Level (1-5)" required>
-            <!-- Add dropdowns for categorical features as needed -->
-            <button type="submit">Predict</button>
+    <nav class="navbar">
+        <div class="nav-brand">HR Analytics</div>
+        <div class="nav-links">
+            <a href="/" class="active">Predict</a>
+            <a href="/metrics">Model Stats</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="hero-section">
+            <h1>Employee Attrition Predictor</h1>
+            <p>Predict whether an employee is likely to stay or leave based on key factors</p>
+        </div>
+
+        <form action="/predict" method="post" class="prediction-form">
+            <!-- Personal Info Section -->
+            <section class="form-section">
+                <h2>Personal Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="Age">Age</label>
+                        <input type="number" id="Age" name="Age" min="18" max="65" value="35" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Gender">Gender</label>
+                        <select id="Gender" name="Gender" required>
+                            {% for opt in options.Gender %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="MaritalStatus">Marital Status</label>
+                        <select id="MaritalStatus" name="MaritalStatus" required>
+                            {% for opt in options.MaritalStatus %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="DistanceFromHome">Distance From Home (miles)</label>
+                        <input type="number" id="DistanceFromHome" name="DistanceFromHome" min="1" max="30" value="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="Education">Education Level (1-5)</label>
+                        <select id="Education" name="Education" required>
+                            <option value="1">1 - Below College</option>
+                            <option value="2">2 - College</option>
+                            <option value="3" selected>3 - Bachelor</option>
+                            <option value="4">4 - Master</option>
+                            <option value="5">5 - Doctor</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="EducationField">Education Field</label>
+                        <select id="EducationField" name="EducationField" required>
+                            {% for opt in options.EducationField %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Job Details Section -->
+            <section class="form-section">
+                <h2>Job Details</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="Department">Department</label>
+                        <select id="Department" name="Department" required>
+                            {% for opt in options.Department %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="JobRole">Job Role</label>
+                        <select id="JobRole" name="JobRole" required>
+                            {% for opt in options.JobRole %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="JobLevel">Job Level (1-5)</label>
+                        <select id="JobLevel" name="JobLevel" required>
+                            <option value="1">1 - Entry</option>
+                            <option value="2" selected>2 - Junior</option>
+                            <option value="3">3 - Mid</option>
+                            <option value="4">4 - Senior</option>
+                            <option value="5">5 - Executive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="BusinessTravel">Business Travel</label>
+                        <select id="BusinessTravel" name="BusinessTravel" required>
+                            {% for opt in options.BusinessTravel %}
+                            <option value="{{ opt }}">{{ opt.replace('_', ' ') }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="OverTime">Overtime</label>
+                        <select id="OverTime" name="OverTime" required>
+                            {% for opt in options.OverTime %}
+                            <option value="{{ opt }}">{{ opt }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Compensation Section -->
+            <section class="form-section">
+                <h2>Compensation</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="MonthlyIncome">Monthly Income ($)</label>
+                        <input type="number" id="MonthlyIncome" name="MonthlyIncome" min="1000" max="20000" value="5000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="DailyRate">Daily Rate ($)</label>
+                        <input type="number" id="DailyRate" name="DailyRate" min="100" max="1500" value="800" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="HourlyRate">Hourly Rate ($)</label>
+                        <input type="number" id="HourlyRate" name="HourlyRate" min="30" max="100" value="65" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="MonthlyRate">Monthly Rate ($)</label>
+                        <input type="number" id="MonthlyRate" name="MonthlyRate" min="2000" max="27000" value="14000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="PercentSalaryHike">Salary Hike (%)</label>
+                        <input type="number" id="PercentSalaryHike" name="PercentSalaryHike" min="11" max="25" value="14" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="StockOptionLevel">Stock Option Level (0-3)</label>
+                        <select id="StockOptionLevel" name="StockOptionLevel" required>
+                            <option value="0">0 - None</option>
+                            <option value="1" selected>1 - Low</option>
+                            <option value="2">2 - Medium</option>
+                            <option value="3">3 - High</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section class="form-section">
+                <h2>Experience</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="TotalWorkingYears">Total Working Years</label>
+                        <input type="number" id="TotalWorkingYears" name="TotalWorkingYears" min="0" max="40" value="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="YearsAtCompany">Years at Company</label>
+                        <input type="number" id="YearsAtCompany" name="YearsAtCompany" min="0" max="40" value="5" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="YearsInCurrentRole">Years in Current Role</label>
+                        <input type="number" id="YearsInCurrentRole" name="YearsInCurrentRole" min="0" max="20" value="3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="YearsWithCurrManager">Years with Current Manager</label>
+                        <input type="number" id="YearsWithCurrManager" name="YearsWithCurrManager" min="0" max="20" value="3" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="YearsSinceLastPromotion">Years Since Last Promotion</label>
+                        <input type="number" id="YearsSinceLastPromotion" name="YearsSinceLastPromotion" min="0" max="15" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="NumCompaniesWorked">Number of Companies Worked</label>
+                        <input type="number" id="NumCompaniesWorked" name="NumCompaniesWorked" min="0" max="10" value="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="TrainingTimesLastYear">Training Times Last Year</label>
+                        <input type="number" id="TrainingTimesLastYear" name="TrainingTimesLastYear" min="0" max="6" value="2" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Satisfaction Section -->
+            <section class="form-section">
+                <h2>Satisfaction & Performance</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="JobSatisfaction">Job Satisfaction (1-4)</label>
+                        <select id="JobSatisfaction" name="JobSatisfaction" required>
+                            <option value="1">1 - Low</option>
+                            <option value="2">2 - Medium</option>
+                            <option value="3" selected>3 - High</option>
+                            <option value="4">4 - Very High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="EnvironmentSatisfaction">Environment Satisfaction (1-4)</label>
+                        <select id="EnvironmentSatisfaction" name="EnvironmentSatisfaction" required>
+                            <option value="1">1 - Low</option>
+                            <option value="2">2 - Medium</option>
+                            <option value="3" selected>3 - High</option>
+                            <option value="4">4 - Very High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="RelationshipSatisfaction">Relationship Satisfaction (1-4)</label>
+                        <select id="RelationshipSatisfaction" name="RelationshipSatisfaction" required>
+                            <option value="1">1 - Low</option>
+                            <option value="2">2 - Medium</option>
+                            <option value="3" selected>3 - High</option>
+                            <option value="4">4 - Very High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="WorkLifeBalance">Work-Life Balance (1-4)</label>
+                        <select id="WorkLifeBalance" name="WorkLifeBalance" required>
+                            <option value="1">1 - Bad</option>
+                            <option value="2">2 - Good</option>
+                            <option value="3" selected>3 - Better</option>
+                            <option value="4">4 - Best</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="JobInvolvement">Job Involvement (1-4)</label>
+                        <select id="JobInvolvement" name="JobInvolvement" required>
+                            <option value="1">1 - Low</option>
+                            <option value="2">2 - Medium</option>
+                            <option value="3" selected>3 - High</option>
+                            <option value="4">4 - Very High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="PerformanceRating">Performance Rating (3-4)</label>
+                        <select id="PerformanceRating" name="PerformanceRating" required>
+                            <option value="3" selected>3 - Excellent</option>
+                            <option value="4">4 - Outstanding</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="reset" class="btn-secondary">Reset Form</button>
+                <button type="submit" class="btn-primary">Predict Attrition</button>
+            </div>
         </form>
-    </div>
+
+        {% if metrics %}
+        <div class="model-info">
+            <h3>Model Performance</h3>
+            <div class="metrics-mini">
+                <span>Accuracy: {{ "%.1f"|format(metrics.accuracy * 100) }}%</span>
+                <span>F1 Score: {{ "%.2f"|format(metrics.f1_score) }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+        <p>Employee Attrition Prediction System • Built with XGBoost</p>
+    </footer>
 </body>
 </html>

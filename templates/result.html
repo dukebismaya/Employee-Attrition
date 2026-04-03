@@ -1,14 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prediction Result</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Prediction Result</h1>
-        <p>{{ prediction }}</p>
-        <a href="/">Back</a>
-    </div>
+    <nav class="navbar">
+        <div class="nav-brand">HR Analytics</div>
+        <div class="nav-links">
+            <a href="/">Predict</a>
+            <a href="/metrics">Model Stats</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% if error %}
+        <div class="result-card error">
+            <div class="result-icon">⚠️</div>
+            <h1>Error</h1>
+            <p>{{ error }}</p>
+            <a href="/" class="btn-primary">Try Again</a>
+        </div>
+        {% else %}
+        <div class="result-card {{ 'danger' if result.prediction == 'LEAVE' else 'success' }}">
+            <div class="result-icon">
+                {% if result.prediction == 'LEAVE' %}🚪{% else %}✅{% endif %}
+            </div>
+            <h1>Prediction: {{ result.prediction }}</h1>
+            <p class="confidence">Confidence: {{ result.confidence }}%</p>
+            
+            <div class="probability-bar">
+                <div class="prob-section stay" style="width: {{ result.stay_prob }}%">
+                    <span>Stay {{ result.stay_prob }}%</span>
+                </div>
+                <div class="prob-section leave" style="width: {{ result.leave_prob }}%">
+                    <span>Leave {{ result.leave_prob }}%</span>
+                </div>
+            </div>
+
+            <div class="result-details">
+                <h3>Employee Summary</h3>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <span class="label">Age</span>
+                        <span class="value">{{ data.Age }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Department</span>
+                        <span class="value">{{ data.Department }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Job Role</span>
+                        <span class="value">{{ data.JobRole }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Monthly Income</span>
+                        <span class="value">${{ data.MonthlyIncome }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Years at Company</span>
+                        <span class="value">{{ data.YearsAtCompany }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Job Satisfaction</span>
+                        <span class="value">{{ data.JobSatisfaction }}/4</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if result.prediction == 'LEAVE' %}
+            <div class="recommendation">
+                <h4>Retention Recommendations</h4>
+                <ul>
+                    <li>Review compensation and benefits package</li>
+                    <li>Schedule a one-on-one meeting to discuss career growth</li>
+                    <li>Consider work-life balance improvements</li>
+                    <li>Evaluate training and development opportunities</li>
+                </ul>
+            </div>
+            {% endif %}
+
+            <div class="actions">
+                <a href="/" class="btn-primary">New Prediction</a>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <footer class="footer">
+        <p>Employee Attrition Prediction System • Built with XGBoost</p>
+    </footer>
 </body>
 </html>
