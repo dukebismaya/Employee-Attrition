@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Attrition Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Attrition Prediction</h1>
+        <form action="/predict" method="post">
+            <input type="number" name="Age" placeholder="Age" required>
+            <input type="number" name="DailyRate" placeholder="Daily Rate" required>
+            <input type="number" name="DistanceFromHome" placeholder="Distance From Home" required>
+            <input type="number" name="MonthlyIncome" placeholder="Monthly Income" required>
+            <input type="number" name="TotalWorkingYears" placeholder="Total Working Years" required>
+            <input type="number" name="YearsAtCompany" placeholder="Years At Company" required>
+            <input type="number" name="JobLevel" placeholder="Job Level (1-5)" required>
+            <!-- Add dropdowns for categorical features as needed -->
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+</body>
+</html>
